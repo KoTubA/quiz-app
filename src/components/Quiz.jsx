@@ -8,7 +8,8 @@ const Quiz = () => {
 
   const fetchRandomQuestion = async () => {
     try {
-      const randomQuestionIndex = Math.floor(Math.random() * totalQuestions) + 1;
+      // const randomQuestionIndex = Math.floor(Math.random() * totalQuestions) + 1;
+      const randomQuestionIndex = 41;
       const response = await fetch("https://graphql.contentful.com/content/v1/spaces/cl9vl6k6hgmo", {
         method: "POST",
         headers: {
@@ -118,6 +119,18 @@ const Quiz = () => {
     console.log("Nowe dane w questionData:", questionData);
   }, [questionData]);
 
+  // Funkcja do przetasowywania tablicy
+  const shuffleArray = (array) => {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+    return shuffledArray;
+  };
+
+  const answerOptions = ["A", "B", "C", "D"];
+
   return (
     <main className="flex justify-center lg:items-center text-white min-h-screen p-4">
       <section className="max-w-2xl w-full">
@@ -129,6 +142,11 @@ const Quiz = () => {
               <p className="text-sm md:text-xl italic text-foreground-brand/70">Pytanie numer: {questionData.id}</p>
               <p className="text-xl font-medium md:text-2xl">{questionData.titleQuestion}</p>
             </div>
+            {questionData.photo && questionData.photo.url && (
+              <div className="mb-6">
+                <img src={questionData.photo.url} alt="Quiz" className="w-full h-auto" />
+              </div>
+            )}
             <form
               method="POST"
               className="flex flex-col justify-center items-center gap-4 md:gap-8"
@@ -136,7 +154,7 @@ const Quiz = () => {
                 e.preventDefault();
               }}
             >
-              {Object.entries(questionData).map(([key, value]) => {
+              {shuffleArray(Object.entries(questionData)).map(([key, value]) => {
                 if (key.includes("answear")) {
                   const index = key.slice(-1);
                   const isCorrect = index === questionData.correctAnswear;
