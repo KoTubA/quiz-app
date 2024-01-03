@@ -119,8 +119,8 @@ const Quiz = () => {
   }, [questionData]);
 
   return (
-    <main className="flex justify-center items-center text-white">
-      <section className="max-w-2xl w-full lg:pt-[10vh] px-4 pt-8">
+    <main className="flex justify-center items-center text-white min-h-screen p-4">
+      <section className="max-w-2xl w-full">
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : questionData ? (
