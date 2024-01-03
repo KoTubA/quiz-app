@@ -1,0 +1,75 @@
+---
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+<style is:global>
+	@tailwind base;
+
+	@layer base {
+	:root {
+		--font-sans: 'Rubik Variable', system-ui, sans-serif;
+		--foreground-brand-color: 0deg 0% 100%;
+		--foreground-accent-color: 277deg 91% 56%;
+
+		--surface-brand-1-color: 216deg 25% 25%;
+		--surface-brand-2-color: 215deg 27% 32%;
+		--surface-accent-1-color: 277deg 91% 56%;
+
+		--success-color: 151deg 70% 50%;
+		--error-color: 0deg 82% 63%;
+	}
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+
+	}
+
+	body {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		min-height: 100vh;
+		width: 100%;
+		background-color: hsl(var(--surface-brand-1-color) / 1) ;
+	}
+
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
+	}
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		overflow-wrap: break-word;
+	}
+
+	}
+
+	@tailwind components;
+	@tailwind utilities;
+</style>
