@@ -4,55 +4,10 @@ const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
   const [error, setError] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [totalQuestions, setTotalQuestions] = useState(0);
-
-  const fetchRandomQuestion = async () => {
-    try {
-      const randomQuestionIndex = Math.floor(Math.random() * totalQuestions) + 1;
-      const response = await fetch("https://graphql.contentful.com/content/v1/spaces/cl9vl6k6hgmo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Bearer w5Iho2RuaFEBtJh5OEopfU0Z-WKNzD0uZEu41CrCntk`,
-        },
-        body: JSON.stringify({
-          query: `
-            {
-              quizAppCollection(where: {
-                id: ${randomQuestionIndex}
-              }) {
-                items {
-                  id
-                  titleQuestion
-                  answearA
-                  answearB
-                  answearC
-                  answearD
-                  correctAnswear
-                  photo {
-                    url
-                  }
-                }
-              }
-            }
-          `,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setQuestionData(result.data.quizAppCollection.items[0]);
-    } catch (error) {
-      console.error("Error fetching question:", error);
-      setError("Wystąpił błąd podczas pobierania pytania. Spróbuj ponownie później.");
-    }
-  };
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   useEffect(() => {
-    const fetchQuestionsCount = async () => {
+    const fetchQuestions = async () => {
       try {
         const response = await fetch("https://graphql.contentful.com/content/v1/spaces/cl9vl6k6hgmo", {
           method: "POST",
@@ -63,9 +18,18 @@ const Quiz = () => {
           body: JSON.stringify({
             query: `
               {
-                quizAppCollection(limit: 1, order: [id_DESC]) {
+                quizAppCollection(order: [id_ASC]) {
                   items {
                     id
+                    titleQuestion
+                    answearA
+                    answearB
+                    answearC
+                    answearD
+                    correctAnswear
+                    photo {
+                      url
+                    }
                   }
                 }
               }
@@ -78,22 +42,17 @@ const Quiz = () => {
         }
 
         const result = await response.json();
-        setTotalQuestions(result.data.quizAppCollection.items[0].id);
+        setQuestionData(result.data.quizAppCollection.items);
       } catch (error) {
-        console.error("Error fetching questions count:", error);
+        console.error("Error fetching questions:", error);
+        setError("Wystąpił błąd podczas pobierania pytań. Spróbuj ponownie później.");
       }
     };
 
-    fetchQuestionsCount();
+    fetchQuestions();
   }, []);
 
-  //Wywołuje sie przy pobraniu ilosci pytań w bazie (w tym przypadku tylko na poczatku - w celu zaminy tego zachowania ponizszy kod rowniez trzeba przystosować)
-  useEffect(() => {
-    if (totalQuestions > 0) {
-      // Wywołaj funkcję pobierającą losowe pytanie, jeśli jest co najmniej jedno pytanie
-      fetchRandomQuestion();
-    }
-  }, [totalQuestions]);
+  const currentQuestion = questionData && questionData[currentQuestionIndex];
 
   const handleAnswerSelection = (index) => {
     // Sprawdź, czy już wybrano odpowiedź
@@ -105,33 +64,57 @@ const Quiz = () => {
   };
 
   const handleNextQuestion = () => {
-    // Zresetowania do wartosci fabrycznych przy ładowaniu nowego pytania
+    // Zresetuj do wartości fabrycznych przy ładowaniu nowego pytania
     setSelectedAnswer(null);
-    setQuestionData(null);
     setError(null);
-    // Ładuj kolejne pytanie
-    fetchRandomQuestion();
+
+    // Przejdź do kolejnego pytania lub wróć do pierwszego, jeśli osiągnięto koniec
+    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % (questionData.length || 1));
   };
 
-  //Do sprawdzania działania aplikacji
+  const handleQuestionItemClick = (index) => {
+    // Przełącz na pytanie o indeksie
+    setCurrentQuestionIndex(index);
+    // Zresetuj wartość wybranej odpowiedzi
+    setSelectedAnswer(null);
+    // Zresetuj ewentualne komunikaty o błędach
+    setError(null);
+  };
+
+  // Do sprawdzania działania aplikacji
   useEffect(() => {
     console.log("Nowe dane w questionData:", questionData);
-  }, [questionData]);
+    console.log("Aktualne pytanie:", currentQuestion);
+  }, [questionData, currentQuestion]);
 
   return (
-    <main className="flex justify-center lg:items-center text-white min-h-screen p-4">
-      <section className="max-w-2xl w-full">
+    <main className="flex justify-center lg:items-center text-white min-h-screen px-4 py-4 lg:py-8">
+      <section className="max-w-3xl w-full">
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
-        ) : questionData ? (
+        ) : currentQuestion ? (
           <>
-            <div className="mb-6 flex flex-col gap-3 md:mb-10 md:gap-7">
-              <p className="text-sm md:text-xl italic text-foreground-brand/70">Pytanie numer: {questionData.id}</p>
-              <p className="text-xl font-medium md:text-2xl">{questionData.titleQuestion}</p>
+            <div className="mb-6 max-h-36 overflow-y-auto bg-surface-brand-2 p-3 rounded-xl section-scroll">
+              <ul className="flex flex-wrap w-full">
+                {questionData.map((question, index) => (
+                  <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none bg-slate-100 text-slate-500 cursor-pointer	${index === currentQuestionIndex ? "bg-surface-accent-1 text-white" : ""}`} onClick={() => handleQuestionItemClick(index)}>
+                    {index + 1}
+                  </li>
+                ))}
+              </ul>
             </div>
-            {questionData.photo && questionData.photo.url && (
+            <div className="mb-8 flex flex-col gap-3">
+              <div className="flex gap-2 justify-between">
+                <span className="text-sm md:text-xl italic text-foreground-brand/70">
+                  Pytanie numer {currentQuestionIndex + 1} z {questionData.length}
+                </span>
+                <span className="text-sm md:text-xl italic text-foreground-brand/70">Pytanie ID: {currentQuestion.id}</span>
+              </div>
+              <p className="text-xl font-medium md:text-2xl">{currentQuestion.titleQuestion}</p>
+            </div>
+            {currentQuestion.photo && currentQuestion.photo.url && (
               <div className="mb-6">
-                <img src={questionData.photo.url} alt="Quiz" className="w-full h-auto" />
+                <img src={currentQuestion.photo.url} alt="Quiz" className="w-full h-auto" />
               </div>
             )}
             <form
@@ -141,19 +124,18 @@ const Quiz = () => {
                 e.preventDefault();
               }}
             >
-              {(Object.entries(questionData)).map(([key, value]) => {
+              {Object.entries(currentQuestion).map(([key, value]) => {
                 if (key.includes("answear")) {
                   const index = key.slice(-1);
-                  const isCorrect = index === questionData.correctAnswear;
-                  const isWrong = index === selectedAnswer && index !== questionData.correctAnswear;
+                  const isCorrect = index === currentQuestion.correctAnswear;
+                  const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswear;
 
                   return (
                     <div key={key} className="w-full">
-                      <input id={`answer-${index}`} name={`answer-${index}`} type="radio" value={index} className="hidden focus:outline-none" onChange={() => handleAnswerSelection(index)} />
-                      <label className={`flex ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} htmlFor={`answer-${index}`}>
+                      <button id={`answer-${index}`} name={`answer-${index}`} className={`flex w-full ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} onClick={() => handleAnswerSelection(index)}>
                         <span className={`flex flex-shrink-0 justify-center items-center h-12 w-12 rounded-xl ${selectedAnswer !== null ? (isCorrect ? "bg-success text-white" : isWrong ? "bg-error text-white" : "bg-slate-100 text-slate-500") : "bg-slate-100 text-slate-500"}`}>{index}</span>
-                        <span>{value}</span>
-                      </label>
+                        <span className="text-left">{value}</span>
+                      </button>
                     </div>
                   );
                 }
@@ -165,7 +147,7 @@ const Quiz = () => {
             </form>
           </>
         ) : (
-          <p className="text-center">Ładowanie pytania...</p>
+          <p className="text-center text-xl font-medium md:text-2xl">Ładowanie bazy pytań ...</p>
         )}
       </section>
     </main>
