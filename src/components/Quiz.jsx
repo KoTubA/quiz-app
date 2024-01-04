@@ -8,8 +8,7 @@ const Quiz = () => {
 
   const fetchRandomQuestion = async () => {
     try {
-      // const randomQuestionIndex = Math.floor(Math.random() * totalQuestions) + 1;
-      const randomQuestionIndex = 41;
+      const randomQuestionIndex = Math.floor(Math.random() * totalQuestions) + 1;
       const response = await fetch("https://graphql.contentful.com/content/v1/spaces/cl9vl6k6hgmo", {
         method: "POST",
         headers: {
@@ -119,18 +118,6 @@ const Quiz = () => {
     console.log("Nowe dane w questionData:", questionData);
   }, [questionData]);
 
-  // Funkcja do przetasowywania tablicy
-  const shuffleArray = (array) => {
-    const shuffledArray = [...array];
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray;
-  };
-
-  const answerOptions = ["A", "B", "C", "D"];
-
   return (
     <main className="flex justify-center lg:items-center text-white min-h-screen p-4">
       <section className="max-w-2xl w-full">
@@ -154,7 +141,7 @@ const Quiz = () => {
                 e.preventDefault();
               }}
             >
-              {shuffleArray(Object.entries(questionData)).map(([key, value]) => {
+              {(Object.entries(questionData)).map(([key, value]) => {
                 if (key.includes("answear")) {
                   const index = key.slice(-1);
                   const isCorrect = index === questionData.correctAnswear;
