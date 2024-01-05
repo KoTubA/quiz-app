@@ -14,12 +14,12 @@ const Quiz = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            authorization: `Bearer w5Iho2RuaFEBtJh5OEopfU0Z-WKNzD0uZEu41CrCntk`,
+            authorization: `Bearer dpuA2Ad0frndDj9NbZhYlGeYBWp0Bfkq8f3BA8FcELw`,
           },
           body: JSON.stringify({
             query: `
               {
-                quizAppCollection(order: [id_ASC]) {
+                quizAppCollection(order: [id_ASC], limit: 500) {
                   items {
                     id
                     titleQuestion
