@@ -93,6 +93,13 @@ const Quiz = () => {
     setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % (questionData.length || 1));
   };
 
+  const handleRandomQuestion = () => {
+    const randomIndex = Math.floor(Math.random() * questionData.length);
+    setCurrentQuestionIndex(randomIndex);
+    setSelectedAnswer(null);
+    setError(null);
+  };
+
   const handleQuestionItemClick = (index) => {
     // Switch to the question at the specified index
     setCurrentQuestionIndex(index);
@@ -102,71 +109,90 @@ const Quiz = () => {
     setError(null);
   };
 
+  // Function to reset localStorage
+  const handleResetLocalStorage = () => {
+    localStorage.removeItem("quiz_answers");
+    setUserAnswers({});
+    setSelectedAnswer(null);
+  };
+
   return (
-    <main className="flex justify-center lg:items-center text-white min-h-screen px-4 py-4 lg:py-8">
+    <main className="flex justify-center lg:items-center text-white min-h-screen px-4 py-4 lg:py-12">
       <section className="max-w-3xl w-full">
         {error ? (
           <p className="text-error text-center text-xl font-medium md:text-2xl">{error}</p>
         ) : currentQuestion ? (
-          <>
-            <div className="mb-6 max-h-36 overflow-y-auto bg-surface-brand-2 p-3 rounded-xl section-scroll">
-              <ul className="flex flex-wrap w-full">
-                {questionData.map((question, index) => {
-                  const userAnswer = userAnswers[question.id];
-                  const isCorrect = userAnswer === question.correctAnswer;
-                  const isWrong = userAnswer && userAnswer !== question.correctAnswer;
+          <div className="flex md:flex-col flex-col-reverse md:gap-6 gap-12">
+            <div className="flex flex-col">
+              <div className="mb-6 max-h-36 overflow-y-auto bg-surface-brand-2 p-3 rounded-xl section-scroll">
+                <ul className="flex flex-wrap w-full">
+                  {questionData.map((question, index) => {
+                    const userAnswer = userAnswers[question.id];
+                    const isCorrect = userAnswer === question.correctAnswer;
+                    const isWrong = userAnswer && userAnswer !== question.correctAnswer;
 
-                  return (
-                    <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none cursor-pointer ${index === currentQuestionIndex && !isCorrect && !isWrong ? "bg-surface-accent-1 text-white" : isCorrect ? "bg-success" : isWrong ? "bg-error" : "bg-slate-100 text-slate-500"}`} onClick={() => handleQuestionItemClick(index)}>
-                      {index + 1}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-            <div className="mb-8 flex flex-col gap-3">
-              <div className="flex gap-2 justify-between">
-                <span className="text-sm md:text-xl italic text-foreground-brand/70">
-                  Pytanie numer {currentQuestionIndex + 1} z {questionData.length}
-                </span>
-                <span className="text-sm md:text-xl italic text-foreground-brand/70">Pytanie ID: {currentQuestion.id}</span>
+                    return (
+                      <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none cursor-pointer ${index === currentQuestionIndex && !isCorrect && !isWrong ? "bg-surface-accent-1 text-white" : isCorrect ? "bg-success" : isWrong ? "bg-error" : "bg-slate-100 text-slate-500"}`} onClick={() => handleQuestionItemClick(index)}>
+                        {index + 1}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              <p className="text-xl font-medium md:text-2xl">{currentQuestion.titleQuestion}</p>
-            </div>
-            {currentQuestion.photo && currentQuestion.photo.url && (
-              <div className="mb-6">
-                <img src={currentQuestion.photo.url} alt="Quiz" className="w-full h-auto" />
-              </div>
-            )}
-            <form
-              method="POST"
-              className="flex flex-col justify-center items-center gap-4 md:gap-8"
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-            >
-              {Object.entries(currentQuestion).map(([key, value]) => {
-                if (key.includes("answer")) {
-                  const index = key.slice(-1);
-                  const isCorrect = index === currentQuestion.correctAnswer;
-                  const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswer;
-
-                  return (
-                    <div key={key} className="w-full">
-                      <button id={`answer-${index}`} name={`answer-${index}`} className={`flex w-full ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} onClick={() => handleAnswerSelection(index)}>
-                        <span className={`flex flex-shrink-0 justify-center items-center h-12 w-12 rounded-xl ${selectedAnswer !== null ? (isCorrect ? "bg-success text-white" : isWrong ? "bg-error text-white" : "bg-slate-100 text-slate-500") : "bg-slate-100 text-slate-500"}`}>{index}</span>
-                        <span className="text-left">{value}</span>
-                      </button>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-              <button type="button" onClick={handleNextQuestion} className="w-full rounded-xl bg-surface-accent-1 p-3 font-medium shadow md:text-xl">
-                Kolejne pytanie
+              <button type="button" onClick={handleResetLocalStorage} className="md:self-end rounded-xl bg-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
+                Zresetuj odpowiedzi
               </button>
-            </form>
-          </>
+            </div>
+            <div>
+              <div className="mb-6 flex flex-col gap-3">
+                <div className="flex gap-2 justify-between">
+                  <span className="text-sm md:text-xl italic text-foreground-brand/70">
+                    Pytanie numer {currentQuestionIndex + 1} z {questionData.length}
+                  </span>
+                  <span className="text-sm md:text-xl italic text-foreground-brand/70">Pytanie ID: {currentQuestion.id}</span>
+                </div>
+                <p className="text-xl font-medium md:text-2xl">{currentQuestion.titleQuestion}</p>
+              </div>
+              {currentQuestion.photo && currentQuestion.photo.url && (
+                <div className="mb-6">
+                  <img src={currentQuestion.photo.url} alt="Quiz" className="w-full h-auto" />
+                </div>
+              )}
+              <form
+                method="POST"
+                className="flex flex-col justify-center items-center gap-4 md:gap-8"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                {Object.entries(currentQuestion).map(([key, value]) => {
+                  if (key.includes("answer")) {
+                    const index = key.slice(-1);
+                    const isCorrect = index === currentQuestion.correctAnswer;
+                    const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswer;
+
+                    return (
+                      <div key={key} className="w-full">
+                        <button id={`answer-${index}`} name={`answer-${index}`} className={`flex w-full ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} onClick={() => handleAnswerSelection(index)}>
+                          <span className={`flex flex-shrink-0 justify-center items-center h-12 w-12 rounded-xl ${selectedAnswer !== null ? (isCorrect ? "bg-success text-white" : isWrong ? "bg-error text-white" : "bg-slate-100 text-slate-500") : "bg-slate-100 text-slate-500"}`}>{index}</span>
+                          <span className="text-left">{value}</span>
+                        </button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+                <div className="flex w-full gap-3 flex-col md:flex-row">
+                  <button type="button" onClick={handleRandomQuestion} className="w-full rounded-xl bg-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
+                    Losuj pytanie
+                  </button>
+                  <button type="button" onClick={handleNextQuestion} className="w-full rounded-xl border-2 border-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
+                    Kolejne pytanie
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         ) : (
           <p className="text-center text-xl font-medium md:text-2xl">Ładowanie bazy pytań ...</p>
         )}
