@@ -4,6 +4,7 @@ const Quiz = () => {
   const [questionData, setQuestionData] = useState(null);
   const [error, setError] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
 
@@ -44,6 +45,7 @@ const Quiz = () => {
 
         const result = await response.json();
         setQuestionData(result.data.quizAppCollection.items);
+        setCurrentQuestion(shuffleAnswers(result.data.quizAppCollection.items[0]));
       } catch (error) {
         console.error("Error fetching questions:", error);
         setError("Wystąpił błąd podczas pobierania pytań. Spróbuj ponownie później.");
@@ -71,7 +73,7 @@ const Quiz = () => {
     }
   }, [userAnswers]);
 
-  const currentQuestion = questionData && questionData[currentQuestionIndex];
+  //const currentQuestion = questionData && questionData[currentQuestionIndex];
 
   const handleAnswerSelection = (index) => {
     // Check if an answer has already been selected
@@ -91,6 +93,8 @@ const Quiz = () => {
 
     // Move to the next question or go back to the first one if at the end
     setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % (questionData.length || 1));
+    // Set the current question based on the updated index
+    setCurrentQuestion(shuffleAnswers(questionData[(currentQuestionIndex + 1) % (questionData.length || 1)]));
   };
 
   const handleRandomQuestion = () => {
@@ -98,6 +102,7 @@ const Quiz = () => {
     setCurrentQuestionIndex(randomIndex);
     setSelectedAnswer(null);
     setError(null);
+    setCurrentQuestion(shuffleAnswers(questionData[randomIndex]));
   };
 
   const handleQuestionItemClick = (index) => {
@@ -107,13 +112,35 @@ const Quiz = () => {
     setSelectedAnswer(null);
     // Reset any error messages
     setError(null);
+    setCurrentQuestion(shuffleAnswers(questionData[index]));
   };
 
   // Function to reset localStorage
   const handleResetLocalStorage = () => {
     localStorage.removeItem("quiz_answers");
     setUserAnswers({});
+    setCurrentQuestion(shuffleAnswers(questionData[currentQuestionIndex]));
     setSelectedAnswer(null);
+  };
+
+  // Elements needed for question randomization:
+  // Answer labels used for assigning letters to answers (A, B, C, D)
+  const answerLabels = ["A", "B", "C", "D"];
+
+  // Answer counter used for assigning answer labels in order (A, B, C, D)
+  let answerCounter = 0;
+
+  // Function for shuffling answers in a question
+  const shuffleAnswers = (question) => {
+    const keys = Object.keys(question);
+    keys.sort(() => Math.random() - 0.5);
+
+    const shuffledObject = {};
+    keys.forEach((key) => {
+      shuffledObject[key] = question[key];
+    });
+
+    return shuffledObject;
   };
 
   return (
@@ -165,16 +192,17 @@ const Quiz = () => {
                   e.preventDefault();
                 }}
               >
-                {Object.entries(currentQuestion).map(([key, value]) => {
+                {Object.entries(currentQuestion).map(([key, value], i) => {
                   if (key.includes("answer")) {
+                    const counter = answerCounter++;
                     const index = key.slice(-1);
                     const isCorrect = index === currentQuestion.correctAnswer;
                     const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswer;
 
                     return (
                       <div key={key} className="w-full">
-                        <button id={`answer-${index}`} name={`answer-${index}`} className={`flex w-full ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} onClick={() => handleAnswerSelection(index)}>
-                          <span className={`flex flex-shrink-0 justify-center items-center h-12 w-12 rounded-xl ${selectedAnswer !== null ? (isCorrect ? "bg-success text-white" : isWrong ? "bg-error text-white" : "bg-slate-100 text-slate-500") : "bg-slate-100 text-slate-500"}`}>{index}</span>
+                        <button className={`flex w-full ${selectedAnswer !== null ? "cursor-default" : "cursor-pointer"} items-center gap-4 rounded-xl border-2 bg-surface-brand-2 p-3 font-medium shadow md:gap-8 md:text-xl ${selectedAnswer !== null ? (isCorrect ? "border-success" : isWrong ? "border-error" : "border-surface-brand-2") : "border-surface-brand-2"}`} onClick={() => handleAnswerSelection(index)}>
+                          <span className={`flex flex-shrink-0 justify-center items-center h-12 w-12 rounded-xl ${selectedAnswer !== null ? (isCorrect ? "bg-success text-white" : isWrong ? "bg-error text-white" : "bg-slate-100 text-slate-500") : "bg-slate-100 text-slate-500"}`}>{answerLabels[counter]}</span>
                           <span className="text-left">{value}</span>
                         </button>
                       </div>
