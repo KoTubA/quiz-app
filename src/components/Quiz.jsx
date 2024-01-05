@@ -5,6 +5,7 @@ const Quiz = () => {
   const [error, setError] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -22,11 +23,11 @@ const Quiz = () => {
                   items {
                     id
                     titleQuestion
-                    answearA
-                    answearB
-                    answearC
-                    answearD
-                    correctAnswear
+                    answerA
+                    answerB
+                    answerC
+                    answerD
+                    correctAnswer
                     photo {
                       url
                     }
@@ -49,58 +50,78 @@ const Quiz = () => {
       }
     };
 
+    const storedAnswers = JSON.parse(localStorage.getItem("quiz_answers")) || {};
+    setUserAnswers(storedAnswers);
+
     fetchQuestions();
   }, []);
+
+  // Function to save answers to localStorage
+  const saveAnswerToLocalStorage = (questionId, selectedAnswer) => {
+    setUserAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionId]: selectedAnswer,
+    }));
+  };
+
+  // Effect to monitor changes in userAnswers and save them to localStorage
+  useEffect(() => {
+    if (userAnswers) {
+      localStorage.setItem("quiz_answers", JSON.stringify(userAnswers));
+    }
+  }, [userAnswers]);
 
   const currentQuestion = questionData && questionData[currentQuestionIndex];
 
   const handleAnswerSelection = (index) => {
-    // Sprawdź, czy już wybrano odpowiedź
+    // Check if an answer has already been selected
     if (selectedAnswer !== null) {
       return;
     }
 
+    // Save the answer to localStorage upon selection
+    saveAnswerToLocalStorage(currentQuestion.id, index);
     setSelectedAnswer(index);
   };
 
   const handleNextQuestion = () => {
-    // Zresetuj do wartości fabrycznych przy ładowaniu nowego pytania
+    // Reset to default values when loading a new question
     setSelectedAnswer(null);
     setError(null);
 
-    // Przejdź do kolejnego pytania lub wróć do pierwszego, jeśli osiągnięto koniec
+    // Move to the next question or go back to the first one if at the end
     setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % (questionData.length || 1));
   };
 
   const handleQuestionItemClick = (index) => {
-    // Przełącz na pytanie o indeksie
+    // Switch to the question at the specified index
     setCurrentQuestionIndex(index);
-    // Zresetuj wartość wybranej odpowiedzi
+    // Reset the selected answer value
     setSelectedAnswer(null);
-    // Zresetuj ewentualne komunikaty o błędach
+    // Reset any error messages
     setError(null);
   };
-
-  // Do sprawdzania działania aplikacji
-  useEffect(() => {
-    console.log("Nowe dane w questionData:", questionData);
-    console.log("Aktualne pytanie:", currentQuestion);
-  }, [questionData, currentQuestion]);
 
   return (
     <main className="flex justify-center lg:items-center text-white min-h-screen px-4 py-4 lg:py-8">
       <section className="max-w-3xl w-full">
         {error ? (
-          <p className="text-red-500 text-center">{error}</p>
+          <p className="text-error text-center text-xl font-medium md:text-2xl">{error}</p>
         ) : currentQuestion ? (
           <>
             <div className="mb-6 max-h-36 overflow-y-auto bg-surface-brand-2 p-3 rounded-xl section-scroll">
               <ul className="flex flex-wrap w-full">
-                {questionData.map((question, index) => (
-                  <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none bg-slate-100 text-slate-500 cursor-pointer	${index === currentQuestionIndex ? "bg-surface-accent-1 text-white" : ""}`} onClick={() => handleQuestionItemClick(index)}>
-                    {index + 1}
-                  </li>
-                ))}
+                {questionData.map((question, index) => {
+                  const userAnswer = userAnswers[question.id];
+                  const isCorrect = userAnswer === question.correctAnswer;
+                  const isWrong = userAnswer && userAnswer !== question.correctAnswer;
+
+                  return (
+                    <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none cursor-pointer ${index === currentQuestionIndex && !isCorrect && !isWrong ? "bg-surface-accent-1 text-white" : isCorrect ? "bg-success" : isWrong ? "bg-error" : "bg-slate-100 text-slate-500"}`} onClick={() => handleQuestionItemClick(index)}>
+                      {index + 1}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="mb-8 flex flex-col gap-3">
@@ -125,10 +146,10 @@ const Quiz = () => {
               }}
             >
               {Object.entries(currentQuestion).map(([key, value]) => {
-                if (key.includes("answear")) {
+                if (key.includes("answer")) {
                   const index = key.slice(-1);
-                  const isCorrect = index === currentQuestion.correctAnswear;
-                  const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswear;
+                  const isCorrect = index === currentQuestion.correctAnswer;
+                  const isWrong = index === selectedAnswer && index !== currentQuestion.correctAnswer;
 
                   return (
                     <div key={key} className="w-full">
