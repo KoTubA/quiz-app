@@ -115,6 +115,20 @@ const Quiz = () => {
     setCurrentQuestion(shuffleAnswers(questionData[index]));
   };
 
+  // Function to reset the answer for the current question
+  const handleResetCurrentQuestion = () => {
+    setUserAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [currentQuestion.id]: null,
+    }));
+    // Remove the current question from localStorage
+    const updatedAnswers = { ...userAnswers };
+    delete updatedAnswers[currentQuestion.id];
+    localStorage.setItem("quiz_answers", JSON.stringify(updatedAnswers));
+    setCurrentQuestion(shuffleAnswers(questionData[currentQuestionIndex]));
+    setSelectedAnswer(null);
+  };
+
   // Function to reset localStorage
   const handleResetLocalStorage = () => {
     localStorage.removeItem("quiz_answers");
@@ -166,9 +180,14 @@ const Quiz = () => {
                   })}
                 </ul>
               </div>
-              <button type="button" onClick={handleResetLocalStorage} className="md:self-end rounded-xl bg-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
-                Zresetuj odpowiedzi
-              </button>
+              <div className="flex w-full gap-3 flex-col md:flex-row justify-end">
+                <button type="button" onClick={handleResetCurrentQuestion} className="rounded-xl bg-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
+                  Zresetuj to pytanie
+                </button>
+                <button type="button" onClick={handleResetLocalStorage} className="rounded-xl border-2 border-surface-accent-1 py-3 px-6 font-medium shadow md:text-xl">
+                  Zresetuj odpowiedzi
+                </button>
+              </div>
             </div>
             <div>
               <div className="mb-6 flex flex-col gap-3">
