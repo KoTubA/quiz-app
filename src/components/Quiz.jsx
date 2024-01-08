@@ -45,15 +45,24 @@ const Quiz = () => {
 
         const result = await response.json();
         setQuestionData(result.data.quizAppCollection.items);
-        setCurrentQuestion(shuffleAnswers(result.data.quizAppCollection.items[0]));
+
+        const storedAnswers = JSON.parse(localStorage.getItem("quiz_answers")) || {};
+        const storedCurrentQuestionIndex = localStorage.getItem("current_question_index");
+
+        setUserAnswers(storedAnswers);
+
+        if (storedCurrentQuestionIndex !== null) {
+          const index = parseInt(storedCurrentQuestionIndex, 10);
+          setCurrentQuestionIndex(index);
+          setCurrentQuestion(shuffleAnswers(result.data.quizAppCollection.items[index]));
+        } else {
+          setCurrentQuestion(shuffleAnswers(result.data.quizAppCollection.items[0]));
+        }
       } catch (error) {
-        console.error("Error fetching questions:", error);
+        console.error("Error:", error);
         setError("Wystąpił błąd podczas pobierania pytań. Spróbuj ponownie później.");
       }
     };
-
-    const storedAnswers = JSON.parse(localStorage.getItem("quiz_answers")) || {};
-    setUserAnswers(storedAnswers);
 
     fetchQuestions();
   }, []);
@@ -64,6 +73,11 @@ const Quiz = () => {
       ...prevAnswers,
       [questionId]: selectedAnswer,
     }));
+  };
+
+  //Function to save currect question to localStorage
+  const saveCurrentQuestionIndexToLocalStorage = (index) => {
+    localStorage.setItem("current_question_index", index);
   };
 
   // Effect to monitor changes in userAnswers and save them to localStorage
@@ -92,14 +106,18 @@ const Quiz = () => {
     setError(null);
 
     // Move to the next question or go back to the first one if at the end
-    setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % (questionData.length || 1));
+    const nextIndex = (currentQuestionIndex + 1) % (questionData.length || 1);
+
+    setCurrentQuestionIndex(nextIndex);
+    saveCurrentQuestionIndexToLocalStorage(nextIndex);
     // Set the current question based on the updated index
-    setCurrentQuestion(shuffleAnswers(questionData[(currentQuestionIndex + 1) % (questionData.length || 1)]));
+    setCurrentQuestion(shuffleAnswers(questionData[nextIndex]));
   };
 
   const handleRandomQuestion = () => {
     const randomIndex = Math.floor(Math.random() * questionData.length);
     setCurrentQuestionIndex(randomIndex);
+    saveCurrentQuestionIndexToLocalStorage(randomIndex);
     setSelectedAnswer(null);
     setError(null);
     setCurrentQuestion(shuffleAnswers(questionData[randomIndex]));
@@ -108,6 +126,7 @@ const Quiz = () => {
   const handleQuestionItemClick = (index) => {
     // Switch to the question at the specified index
     setCurrentQuestionIndex(index);
+    saveCurrentQuestionIndexToLocalStorage(index);
     // Reset the selected answer value
     setSelectedAnswer(null);
     // Reset any error messages
@@ -173,7 +192,7 @@ const Quiz = () => {
                     const isWrong = userAnswer && userAnswer !== question.correctAnswer;
 
                     return (
-                      <li key={index + 1} id={`question-${index + 1}`} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none cursor-pointer ${index === currentQuestionIndex && !isCorrect && !isWrong ? "bg-surface-accent-1 text-white" : isCorrect ? "bg-success" : isWrong ? "bg-error" : "bg-slate-100 text-slate-500"}`} onClick={() => handleQuestionItemClick(index)}>
+                      <li key={index + 1} className={`flex justify-center items-center p-1 m-1 w-8 h-8 rounded-xl list-none cursor-pointer ${index === currentQuestionIndex && !isCorrect && !isWrong ? "bg-surface-accent-1 text-white" : isCorrect ? "bg-success" : isWrong ? "bg-error" : "bg-slate-100 text-slate-500"}`} onClick={() => handleQuestionItemClick(index)}>
                         {index + 1}
                       </li>
                     );
