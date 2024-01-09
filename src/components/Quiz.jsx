@@ -46,11 +46,6 @@ const Quiz = () => {
         const result = await response.json();
         setQuestionData(result.data.quizAppCollection.items);
 
-        const storedAnswers = JSON.parse(localStorage.getItem("quiz_answers")) || {};
-        const storedCurrentQuestionIndex = localStorage.getItem("current_question_index");
-
-        setUserAnswers(storedAnswers);
-
         if (storedCurrentQuestionIndex !== null) {
           const index = parseInt(storedCurrentQuestionIndex, 10);
           setCurrentQuestionIndex(index);
@@ -63,6 +58,10 @@ const Quiz = () => {
         setError("Wystąpił błąd podczas pobierania pytań. Spróbuj ponownie później.");
       }
     };
+
+    const storedAnswers = JSON.parse(localStorage.getItem("quiz_answers")) || {};
+    const storedCurrentQuestionIndex = localStorage.getItem("current_question_index");
+    setUserAnswers(storedAnswers);
 
     fetchQuestions();
   }, []);
@@ -83,6 +82,7 @@ const Quiz = () => {
   // Effect to monitor changes in userAnswers and save them to localStorage
   useEffect(() => {
     if (userAnswers) {
+      console.log(userAnswers);
       localStorage.setItem("quiz_answers", JSON.stringify(userAnswers));
     }
   }, [userAnswers]);
