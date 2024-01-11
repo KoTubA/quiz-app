@@ -47,7 +47,11 @@ const Quiz = () => {
         setQuestionData(result.data.quizAppCollection.items);
 
         if (storedCurrentQuestionIndex !== null) {
-          const index = parseInt(storedCurrentQuestionIndex, 10);
+          let index = parseInt(storedCurrentQuestionIndex, 10);
+          // Check if storedCurrentQuestionIndex exceeds the number of questions
+          if (index < 0 || index >= result.data.quizAppCollection.items.length) {
+            index = 0;
+          }
           setCurrentQuestionIndex(index);
           setCurrentQuestion(shuffleAnswers(result.data.quizAppCollection.items[index]));
         } else {
@@ -82,7 +86,6 @@ const Quiz = () => {
   // Effect to monitor changes in userAnswers and save them to localStorage
   useEffect(() => {
     if (userAnswers) {
-      console.log(userAnswers);
       localStorage.setItem("quiz_answers", JSON.stringify(userAnswers));
     }
   }, [userAnswers]);
