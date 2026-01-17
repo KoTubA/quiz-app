@@ -3,6 +3,7 @@ import SingleQuestion from "./QuestionTypes/SingleQuestion";
 import MultipleQuestion from "./QuestionTypes/MultipleQuestion";
 import OpenQuestion from "./QuestionTypes/OpenQuestion";
 import MatchingQuestion from "./QuestionTypes/MatchingQuestion";
+import { UI_TEXT } from "../../config/constants";
 
 /**
  * QuestionRenderer Component
@@ -23,7 +24,11 @@ const QuestionRenderer = ({ question, selectedAnswer, onAnswerSelect, isSubmitte
       return <MatchingQuestion question={question} selectedAnswer={selectedAnswer} onAnswerSelect={onAnswerSelect} isSubmitted={isSubmitted} resetKey={resetKey} />;
 
     default:
-      return <div className="text-error text-center p-4">Nieznany typ pytania: {question.type}</div>;
+      return (
+        <div className="text-error text-center p-4">
+          {UI_TEXT.ERROR_UNKNOWN_TYPE} {question.type}
+        </div>
+      );
   }
 };
 

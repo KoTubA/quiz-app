@@ -1,6 +1,5 @@
 /**
  * Custom hook for managing quiz state and navigation
- * Questions are always reset when navigating - no saved answers
  */
 import { useState, useEffect } from "react";
 

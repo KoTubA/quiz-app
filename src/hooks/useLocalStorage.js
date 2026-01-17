@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 
 const STORAGE_KEYS = {
-  ANSWER_HISTORY: "quiz_answer_history", // Changed from ANSWERS
+  ANSWER_HISTORY: "quiz_answer_history",
   CURRENT_INDEX: "current_question_index",
 };
 

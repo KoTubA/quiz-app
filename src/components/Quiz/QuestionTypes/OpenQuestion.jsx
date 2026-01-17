@@ -1,29 +1,25 @@
 import React from "react";
+import IconCheckCircle from "../../../assets/icons/check_circle.svg?react";
 
 /**
  * OpenQuestion Component
- * Displays open-ended question with "Show Answer" button
+ * Displays open-ended question with answer reveal
  */
 const OpenQuestion = ({ question, selectedAnswer, onAnswerSelect }) => {
   const isRevealed = selectedAnswer?.answer === true;
 
-  const handleToggleAnswer = () => {
-    // Toggle between revealed and hidden
-    onAnswerSelect({ type: "open", answer: !isRevealed });
-  };
-
   return (
     <div className="flex flex-col gap-6 w-full">
       {isRevealed && (
-        <div className="rounded-xl border-2 border-success bg-surface-brand-2 p-6 w-full">
-          <h3 className="text-lg font-semibold mb-3 text-success">Wzorcowa odpowiedź:</h3>
-          <div className="text-base md:text-lg whitespace-pre-line">{question.answer}</div>
+        <div className="relative rounded-xl border border-success/20 bg-surface-dark p-6 w-full shadow-lg shadow-success/5 overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-success"></div>
+          <h3 className="text-lg font-bold mb-3 text-success flex items-center gap-2">
+            <IconCheckCircle className="w-[1em] h-[1em]" />
+            Wzorcowa odpowiedź
+          </h3>
+          <div className="text-base md:text-lg leading-relaxed text-slate-300 whitespace-pre-line pl-1">{question.answer}</div>
         </div>
       )}
-
-      <button type="button" onClick={handleToggleAnswer} className="w-full rounded-xl bg-surface-accent-1 py-4 px-6 font-medium shadow md:text-xl hover:opacity-90 transition-opacity">
-        {isRevealed ? "Ukryj odpowiedź" : "Pokaż odpowiedź"}
-      </button>
     </div>
   );
 };

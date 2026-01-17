@@ -44,12 +44,15 @@ export const checkSingleAnswer = (question, userAnswer) => {
  * @returns {Object} - Object with correctIds, incorrectIds, and missedIds
  */
 export const checkMultipleAnswer = (question, userAnswers) => {
+  // Defensive check: ensure userAnswers is an array
+  const answers = Array.isArray(userAnswers) ? userAnswers : [];
+
   const correctOptions = question.options.filter((opt) => opt.isCorrect);
   const correctIds = correctOptions.map((opt) => opt.id);
 
-  const selectedCorrect = userAnswers.filter((id) => correctIds.includes(id));
-  const selectedIncorrect = userAnswers.filter((id) => !correctIds.includes(id));
-  const missedCorrect = correctIds.filter((id) => !userAnswers.includes(id));
+  const selectedCorrect = answers.filter((id) => correctIds.includes(id));
+  const selectedIncorrect = answers.filter((id) => !correctIds.includes(id));
+  const missedCorrect = correctIds.filter((id) => !answers.includes(id));
 
   return {
     correctIds: selectedCorrect,

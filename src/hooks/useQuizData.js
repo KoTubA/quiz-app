@@ -19,12 +19,10 @@ export const useQuizData = () => {
         const quizData = await import(/* @vite-ignore */ quizConfig.LOCAL_DATA_PATH);
         const questions = quizData.default.questions || quizData.questions;
 
-        // Questions 29 and 68 have been removed from the JSON file
-        // No filtering needed
         setQuestionData(questions);
       } catch (err) {
         console.error("Error fetching questions:", err);
-        setError("Wystąpił błąd podczas wczytywania pytań z pliku lokalnego.");
+        setError("Wystąpił błąd podczas wczytywania pytań.");
       } finally {
         setIsLoading(false);
       }

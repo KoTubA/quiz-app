@@ -12,7 +12,14 @@ export default {
     },
     extend: {
       colors: {
-        primary: colors.emerald,
+        primary: "#3B82F6",
+        "primary-dark": "#1a5b89",
+        "background-light": "#f9fafb",
+        "background-dark": "#0f172a",
+        "surface-dark": "#1e293b",
+        correct: "#10B981",
+        incorrect: "#EF4444",
+        current: "#8B5CF6",
         secondary: colors.purple,
         foreground: {
           brand: withAlphaValue("foreground-brand-color"),
@@ -29,6 +36,10 @@ export default {
         },
         success: withAlphaValue("success-color"),
         error: withAlphaValue("error-color"),
+      },
+      fontFamily: {
+        display: ["Manrope", "sans-serif"],
+        body: ["Noto Sans", "sans-serif"],
       },
     },
   },
