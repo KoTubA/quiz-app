@@ -40,7 +40,7 @@ const QuestionOption = ({
 
   return (
     <label className={`group relative flex items-center p-4 rounded-xl border ${borderColor} ${bgColor} transition-all select-none ${hoverClasses} ${opacityClass}`}>
-      <input className="custom-checkbox sr-only" name={name} type={type} checked={isSelected} onChange={() => !isSubmitted && onChange(id)} disabled={isSubmitted} />
+      <input className="custom-checkbox sr-only" id={`option-${id}`} name={name || `option-${id}`} type={type} checked={isSelected} onChange={() => !isSubmitted && onChange(id)} disabled={isSubmitted} />
 
       {/* Visual checkbox/radio indicator */}
       <div className={`flex items-center justify-center size-5 rounded ${type === "radio" ? "rounded-full" : "rounded"} border ${isSelected ? "border-primary bg-primary" : "border-slate-500 bg-transparent"} transition-all duration-200 mr-4 shrink-0`}>

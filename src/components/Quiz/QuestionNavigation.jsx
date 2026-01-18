@@ -8,9 +8,9 @@ import PropTypes from "prop-types";
  */
 const QuestionNavigation = ({ questions, currentIndex, answerHistory, onQuestionClick }) => {
   return (
-    <section className="bg-background-dark border-b border-slate-800 shadow-xl z-40 relative pt-6">
+    <section className="bg-background-dark border-b border-slate-800 shadow-xl z-40 relative pt-6 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="overflow-y-auto scrollbar-hide p-2 max-h-[90px]">
+        <div className="overflow-y-auto scrollbar-hide p-2 max-h-[60px] sm:max-h-[90px]">
           <div className="flex flex-wrap gap-2 w-full">
             {questions.map((question, index) => {
               const answerStatus = answerHistory[question.id];

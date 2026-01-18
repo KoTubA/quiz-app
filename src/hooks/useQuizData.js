@@ -2,7 +2,7 @@
  * Custom hook for fetching quiz data from local JSON file
  */
 import { useState, useEffect } from "react";
-import { quizConfig } from "../config/quizConfig";
+import quizData from "../data/quizData.json";
 
 export const useQuizData = () => {
   const [questionData, setQuestionData] = useState(null);
@@ -15,10 +15,8 @@ export const useQuizData = () => {
       setError(null);
 
       try {
-        // Load from local JSON file
-        const quizData = await import(/* @vite-ignore */ quizConfig.LOCAL_DATA_PATH);
-        const questions = quizData.default.questions || quizData.questions;
-
+        // Load from local JSON files
+        const questions = quizData.questions;
         setQuestionData(questions);
       } catch (err) {
         console.error("Error fetching questions:", err);

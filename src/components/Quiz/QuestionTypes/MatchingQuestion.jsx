@@ -63,7 +63,7 @@ const MatchingQuestion = ({ question, selectedAnswer, onAnswerSelect, isSubmitte
 
               {/* Right side */}
               <div className="md:w-1/3">
-                <select value={userMatch || ""} onChange={(e) => handleMatchChange(item.left, e.target.value)} disabled={isSubmitted} className={`rounded-lg border ${selectBorderColor} bg-slate-800 px-3 py-2 font-medium text-white text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed w-full focus:outline-none focus:border-primary transition-colors`}>
+                <select name={`match-${item.left}-${index}`} id={`match-${index}`} aria-label={`Dopasuj do ${item.left}`} value={userMatch || ""} onChange={(e) => handleMatchChange(item.left, e.target.value)} disabled={isSubmitted} className={`rounded-lg border ${selectBorderColor} bg-slate-800 px-3 py-2 font-medium text-white text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed w-full focus:outline-none focus:border-primary transition-colors`}>
                   <option value="" className="text-slate-400">
                     {UI_TEXT.SELECT_PLACEHOLDER}
                   </option>
@@ -78,7 +78,7 @@ const MatchingQuestion = ({ question, selectedAnswer, onAnswerSelect, isSubmitte
 
             {isSubmitted && itemResult && !itemResult.isCorrect && (
               <div className="text-sm md:text-base text-success font-bold pl-2 flex items-start gap-2">
-                <IconCheckCircle className="text-lg w-[1em] h-[1em]" />
+                <IconCheckCircle className="text-lg w-[1em] h-[1em] flex-shrink-0" />
                 {UI_TEXT.CORRECT_ANSWER_LABEL} {itemResult.correctAnswer}
               </div>
             )}

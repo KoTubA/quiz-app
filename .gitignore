@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # quiz data
 src/data/quizData.json
+
+
+# agent
+.agent/
+
+# editor
+.vscode/

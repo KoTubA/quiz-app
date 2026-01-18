@@ -138,21 +138,21 @@ const Quiz = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-y-auto">
       {/* Fixed Navigation Header */}
       <QuestionNavigation questions={questionData} currentIndex={currentQuestionIndex} answerHistory={answerHistory} onQuestionClick={handleQuestionSelect} />
 
       {/* Scrollable Main Content */}
-      <main className="flex-1 overflow-y-auto p-4 pb-32">
+      <main className="flex-1 p-4 pb-32">
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Reset Buttons */}
-          <div className="flex justify-between mb-4">
-            <button onClick={onResetCurrent} className="h-9 px-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center gap-2 transition-all text-xs font-bold shadow-sm active:scale-95">
-              <IconRestart className="w-[16px] h-[16px]" />
+          <div className="flex justify-between mb-4 gap-1">
+            <button onClick={onResetCurrent} className="h-9 px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center gap-2 transition-all text-xs font-bold shadow-sm active:scale-95">
+              <IconRestart className="w-[16px] h-[16px] flex-shrink-0" />
               {UI_TEXT.RESET_QUESTION}
             </button>
-            <button onClick={onResetAll} className="h-9 px-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:bg-red-600 hover:text-white hover:border-red-500 flex items-center gap-2 transition-all text-xs font-bold shadow-sm active:scale-95">
-              <IconDeleteSweep className="w-[16px] h-[16px]" />
+            <button onClick={onResetAll} className="h-9 px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:bg-red-600 hover:text-white hover:border-red-500 flex items-center gap-2 transition-all text-xs font-bold shadow-sm active:scale-95">
+              <IconDeleteSweep className="w-[16px] h-[16px] flex-shrink-0" />
               {UI_TEXT.RESET_ALL}
             </button>
           </div>
@@ -168,19 +168,19 @@ const Quiz = () => {
       </main>
 
       {/* Sticky Footer with Action Buttons */}
-      <footer className="fixed bottom-0 inset-x-0 bg-background-dark/95 backdrop-blur-xl border-t border-slate-800 z-50 px-4 py-3 pb-8">
+      <footer className="fixed bottom-0 inset-x-0 bg-background-dark/95 backdrop-blur-xl border-t border-slate-800 z-50 px-4 py-4">
         <div className="max-w-2xl mx-auto">
           <div className="grid grid-cols-[auto_1fr_auto] gap-3">
             <button onClick={handleRandomQuestion} className="h-12 px-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center gap-2 transition-all group font-semibold text-sm active:scale-95" title="Losowe pytanie">
-              <span>{UI_TEXT.RANDOM_BTN}</span>
-              <IconShuffle className="w-[20px] h-[20px]" />
+              <span className="hidden sm:inline">{UI_TEXT.RANDOM_BTN}</span>
+              <IconShuffle className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]" />
             </button>
-            <button onClick={handleSubmit} disabled={isSubmitDisabled()} className="h-12 w-full bg-primary hover:bg-blue-500 text-white font-bold text-base rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary">
+            <button onClick={handleSubmit} disabled={isSubmitDisabled()} className="h-12 w-full bg-primary hover:bg-blue-500 text-white font-bold text-sm sm:text-base rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary">
               {getSubmitButtonText()}
             </button>
             <button onClick={handleNextQuestion} className="h-12 px-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center gap-2 transition-all group font-semibold text-sm active:scale-95" title="Pomiń pytanie">
-              <span>{UI_TEXT.NEXT_BTN}</span>
-              <IconArrowForward className="w-[20px] h-[20px] transition-transform" />
+              <span className="hidden sm:inline">{UI_TEXT.NEXT_BTN}</span>
+              <IconArrowForward className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px] transition-transform" />
             </button>
           </div>
         </div>
